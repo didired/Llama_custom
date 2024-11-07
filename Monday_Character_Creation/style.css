@@ -1,0 +1,692 @@
+body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: #f4f4f9;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#ui-container {
+    width: 22vw;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    pointer-events: auto;
+    background-color: rgba(14, 8, 38, 0.286);; /* Semi-transparent white */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(15px) saturate(180%); /* For Safari support */
+    border-radius: 7px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+    border: 4px solid rgba(255, 255, 255, 0.435); /* Light border for subtle outline */
+    border-radius: 20px;
+    z-index: 10;
+    order: 1;
+}
+
+#canvas-container {
+    width: 78vw; /* Two-thirds of the screen */
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #ffffff 30%, #e1f6fd 60%);
+    background-size: 200% 200%;
+    animation: gradientMove 17s ease infinite;
+    order: 2;
+}
+
+#button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 20px;
+    align-items: flex-start; /* Align items to the left */
+    padding-left: 43px; /* Optional: Adjust if you need to match exact start of #name-bar */
+}
+
+
+/* Keyframes for the subtle gradient movement */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+#name-bar-wrapper {
+    display: flex;
+    align-items: center;
+    padding-left: 20px; /* Aligns with #button-container */
+    pointer-events: auto;
+}
+
+#pencil-icon {
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    right: 150px; /* Adjust based on desired spacing */
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.1s ease;
+}
+
+
+/* Hide the pencil icon when input is in focus */
+#name-bar:focus + #pencil-icon {
+    opacity: 0;
+}
+
+
+/* Name bar styling */
+#name-bar {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    font-size: 35px;
+    padding: 12px 20px; /* Horizontal padding used to align buttons */
+    border: none;
+    border-radius: 7px;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: lightgray;
+    min-width: 150px;
+    max-width: 100%;
+    pointer-events: auto;
+}
+
+/* Hover and focus effects for name bar */
+#name-bar:hover {
+    background-color: rgba(202, 197, 208, 0.671);
+    color: rgb(211, 211, 211);
+}
+
+#name-bar:focus {
+    background-color: rgba(33, 25, 61, 0.286);
+    color: #151A39;
+}
+
+/* Placeholder styling for the name bar with browser prefixes */
+#name-bar::placeholder {
+    color: rgb(211, 211, 211);
+    opacity: 1; /* Ensures color is fully visible */
+}
+
+#name-bar::-webkit-input-placeholder {
+    color: rgb(211, 211, 211);
+}
+
+#name-bar::-moz-placeholder {
+    color: rgb(211, 211, 211);
+}
+
+#name-bar:-ms-input-placeholder {
+    color: rgb(211, 211, 211);
+}
+
+#name-bar:-moz-placeholder {
+    color: rgb(211, 211, 211);
+}
+
+
+/* Hidden span for width calculation */
+#name-bar-width-helper {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    font-size: 45px;
+    visibility: hidden;
+    white-space: nowrap;
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Individual button styling */
+.action-button {
+    position: relative; /* Required for positioning the tooltip relative to the button itself */
+    width: 55px;
+    height: 55px;
+    border-radius: 7px;
+    background-color: #151A39;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+/* Ensure the icon inside the button is centered */
+.action-button img.icon {
+    width: 35px; /* Adjust the size as needed */
+    height: 35px;
+    display: block;
+    margin: auto;
+    pointer-events: none; /* So the icon doesn't interfere with button clicks */
+}
+
+/* Toggle color when active */
+.action-button.active {
+    background-color: #5160EE;
+}
+
+.action-button::after {
+    content: attr(data-tooltip); /* Get tooltip text from data attribute */
+    position: absolute;
+    top: 50%; /* Center the tooltip vertically with respect to the button */
+    left: 120%; /* Position tooltip to the right of the button */
+    transform: translateY(-50%); /* Adjust tooltip for vertical centering */
+    background-color: #151a39ae; /* Tooltip background */
+    color: #d3d3d3; /* Light gray text color */
+    font-family: 'Figtree', sans-serif;
+    font-weight: 300; /* Light font weight */
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0; /* Start with hidden opacity */
+    transition: opacity 0.2s ease; /* Set transition on opacity here */
+    pointer-events: none;
+    z-index: 20;
+}
+
+
+/* Show tooltip only on hover, but hide if button is active */
+.action-button:hover:not(.active)::after {
+    opacity: 1; /* Show tooltip only when button is hovered but not active */
+}
+
+/* Wrapper styling to stack button and color picker vertically */
+.button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+    position: relative;
+}
+
+/* Primary color picker container styling */
+#color-picker-container {
+    display: none;
+    position: absolute;
+    top: 0; /* Align top edge with button's top edge */
+    left: 120%; /* Position container to the right of the button */
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-top: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45); /* Light translucent background */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+#secondary-color-picker-container {
+    display: none;
+    position: absolute;
+    top: calc(100% + 95px);
+    left: 120%; /* Position container to the right of the button */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+
+/* Label styling for color picker */
+.color-picker-label {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* Wrapper for color options in a row */
+.color-options-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Individual color option styling */
+.color-option {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    transition: transform 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: #ccc;
+}
+
+
+
+#hat-selection-container {
+    display: none;
+    position: absolute;
+    top: 0; /* Align top edge with button's top edge */
+    left: 120%; /* Position container to the right of the button */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.hat-options-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Style for regular hat options with frosted glass effect */
+.hat-option:not(.no-hat) {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.793); /* Softer border for glassy effect */
+    background-color: rgba(255, 174, 0, 0.878); /* Light translucent background */
+    backdrop-filter: blur(8px); /* Frosted glass effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover effect for hat options */
+.hat-option:not(.no-hat):hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 115, 0, 0.878); /* Light translucent background */
+    border-color: rgba(255, 255, 255, 0.7); /* Brighter border on hover */
+}
+
+
+/* Special style for the 'No Hat' option */
+.hat-option.no-hat {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.499); /* Base color for "no hat" */
+    border-radius: 5px;
+    border: 0.5px solid rgba(255, 255, 255, 0.793); /* Soft border */
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; /* Enable scaling on hover */
+}
+
+/* Diagonal red line using gradient */
+.hat-option.no-hat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 48%, rgb(212, 62, 62) 48%, rgb(212, 62, 62) 52%, transparent 52%);
+    pointer-events: none;
+    border-radius: 5px;
+}
+
+/* Hover effect */
+.hat-option.no-hat:hover {
+    transform: scale(1.05); /* Slightly enlarges on hover */
+    background-color: rgba(255, 255, 255, 0.184);
+
+}
+
+/* Style for hat options container */
+.hat-option {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.793);
+    background-color: rgba(255, 255, 255, 0.499);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+/* Style for icons inside option buttons */
+.hat-option .option-icon {
+    width: 30px; /* Adjust icon size as needed */
+    height: 30px;
+    pointer-events: none;
+}
+
+/* Shirt selection container styling */
+#shirt-selection-container {
+    display: none;
+    position: absolute;
+    top: 0; /* Align top edge with button's top edge */
+    left: 120%; /* Position container to the right of the button */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.section-option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.793); /* Softer border for glassy effect */
+    background-color: rgba(255, 200, 0, 0.772);
+    backdrop-filter: blur(8px); /* Frosted glass effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.section-option .option-icon {
+    width: 32px; /* Adjust this size if needed */
+    height: 32px;
+    display: block;
+    margin: auto;
+    pointer-events: none;
+}
+
+/* Hover effect for section options */
+.section-option:hover {
+    transform: scale(1.05);
+    background-color: rgba(217, 170, 0, 0.772);
+    border-color: rgba(255, 255, 255, 0.7); /* Brighter border on hover */
+}
+
+/* Special style for the 'No Shirt' option, same as 'No Hat' */
+.section-option.no-shirt {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.499); /* Base color for "no shirt" */
+    border-radius: 5px;
+    border: 0.5px solid rgba(255, 255, 255, 0.793); /* Soft border */
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; /* Enable scaling on hover */
+}
+
+/* Diagonal red line for 'No Shirt' option */
+.section-option.no-shirt::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 48%, rgb(212, 62, 62) 48%, rgb(212, 62, 62) 52%, transparent 52%);
+    pointer-events: none;
+    border-radius: 5px;
+}
+
+/* Hover effect */
+.section-option.no-shirt:hover {
+    transform: scale(1.05); /* Slightly enlarges on hover */
+    background-color: rgba(255, 255, 255, 0.184);
+}
+
+/* Shirt selection container styling */
+#shoe-selection-container {
+    display: none;
+    position: absolute;
+    top: 0; /* Align top edge with button's top edge */
+    left: 120%; /* Position container to the right of the button */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+/* Style for the "No Shoe" option, separate from "No Hat" and "No Shirt" */
+.shoe-option.no-shoe {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.5); /* Base color for no shoe */
+    border-radius: 5px;
+    border: 0.5px solid rgba(255, 255, 255, 0.8); /* Soft border */
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Diagonal red line for "No Shoe" option */
+.shoe-option.no-shoe::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 48%, rgb(212, 62, 62) 48%, rgb(212, 62, 62) 52%, transparent 52%);
+    pointer-events: none;
+    border-radius: 5px;
+}
+
+/* Hover effect for "No Shoe" option */
+.shoe-option.no-shoe:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Style for regular shoe options */
+.shoe-option {
+    width: 40px;
+    height: 40px;
+    display: flex; /* Center content */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    border-radius: 5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.499);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Adjust the icon size specifically for shoe-option */
+.shoe-option .option-icon {
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+}
+
+
+/* Hover effect for regular shoe options */
+.shoe-option:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.184);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Hair selection container styling, similar to other selection containers */
+#hair-selection-container {
+    display: none;
+    position: absolute;
+    top: 0; /* Align top edge with button's top edge */
+    left: 120%; /* Position container to the right of the button */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    background-color: rgba(21, 26, 57, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+
+/* Hair options row layout */
+.hair-options-row {
+    display: flex;
+    gap: 10px; /* Add space between options */
+}
+
+/* Hair option styling */
+.hair-option {
+    width: 40px;
+    height: 40px;
+    display: flex; /* Add flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    border-radius: 5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.793);
+    background-color: rgba(255, 255, 255, 0.499);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Icon inside hair option */
+.hair-option .option-icon {
+    width: 30px; /* Adjust as needed */
+    height: 30px;
+    pointer-events: none;
+}
+
+
+/* Hover effect for hair options */
+.hair-option:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.184);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* Special style for the 'No Hair' option */
+.hair-option.no-hair {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 0.5px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Diagonal red line for "No Hair" option */
+.hair-option.no-hair::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 48%, rgb(212, 62, 62) 48%, rgb(212, 62, 62) 52%, transparent 52%);
+    pointer-events: none;
+    border-radius: 5px;
+}
+
+/* Hover effect for "No Hair" option */
+.hair-option.no-hair:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#monday-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px; /* Adjust size as needed */
+    height: auto;
+    opacity: 0.8; /* Slight transparency */
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    z-index: 15; /* Adjust if needed to ensure it’s above other elements */
+}
+
+.bottom-buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 30px;
+    justify-content: flex-start; /* Align button to the left */
+    padding-left: 43px; /* Align with the other action buttons */
+}
+
+/* Tooltip styling for "Clear" button to appear above */
+#clear-button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -35px; /* Adjust distance to position the tooltip above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #151a39ae;
+    color: #d3d3d3;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 20;
+}
+
+#clear-button:hover::after {
+    opacity: 1;
+}
+
+
+#clear-button:hover::after {
+    opacity: 1;
+}
+
+
+#clear-button:hover::after {
+    opacity: 1;
+}
+
+/* Tooltip styling for "Randomize" button to appear above */
+#randomize-button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -35px; /* Position the tooltip above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #151a39ae;
+    color: #d3d3d3;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 20;
+}
+
+#randomize-button:hover::after {
+    opacity: 1;
+}
