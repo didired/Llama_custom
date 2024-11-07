@@ -619,7 +619,7 @@ body {
     height: auto;
     opacity: 0.8; /* Slight transparency */
     transition: opacity 0.2s ease, transform 0.2s ease;
-    cursor: pointer;
+    cursor: default;
     z-index: 15; /* Adjust if needed to ensure it’s above other elements */
 }
 
